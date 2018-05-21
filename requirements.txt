@@ -1,6 +1,6 @@
 redis
 aiohttp
 schedule
-sanic
+quart
 pyquery
 requests
