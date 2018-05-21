@@ -11,6 +11,13 @@ from .crawler import crawler
 from .validator import validator
 from .logger import logger
 
+#TODO:爬取和验证异步
+# import threading
+# def mthread(func):
+#     '''多线程shedule'''
+#     job = threading.Thread(target=func)
+#     job.start()
+    
 
 def run_schedule():
     """
