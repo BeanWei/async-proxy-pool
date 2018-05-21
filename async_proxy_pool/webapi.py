@@ -1,54 +1,53 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from sanic import Sanic
-from sanic.response import json
+from quart import Quart, jsonify
 
 from async_proxy_pool.database import RedisClient
 
-app = Sanic()
+app = Quart(__name__)
 redis_conn = RedisClient()
 
 
 @app.route("/")
-async def index(request):
-    return json({"Welcome": "This is a proxy pool system."})
+async def index():
+    return jsonify({"Welcome": "This is a proxy pool system."})
 
 
 @app.route("/pop")
-async def pop_proxy(request):
+async def pop_proxy():
     proxy = redis_conn.pop_proxy().decode("utf8")
     if proxy[:5] == "https":
-        return json({"https": proxy})
+        return jsonify({"https": proxy})
     else:
-        return json({"http": proxy})
+        return jsonify({"http": proxy})
 
 
-@app.route("/get/<count:int>")
-async def get_proxy(request, count):
+@app.route("/get/<int:count>")
+async def get_proxy(count):
     res = []
     for proxy in redis_conn.get_proxies(count):
         if proxy[:5] == "https":
             res.append({"https": proxy})
         else:
             res.append({"http": proxy})
-    return json(res)
+    return jsonify(res)
 
 
 @app.route("/count")
-async def count_all_proxies(request):
+async def count_all_proxies():
     count = redis_conn.count_all_proxies()
-    return json({"count": str(count)})
+    return jsonify({"count": str(count)})
 
 
-@app.route("/count/<score:int>")
-async def count_score_proxies(request, score):
+@app.route("/count/<int:score>")
+async def count_score_proxies(score):
     count = redis_conn.count_score_proxies(score)
-    return json({"count": str(count)})
+    return jsonify({"count": str(count)})
 
 
-@app.route("/clear/<score:int>")
-async def clear_proxies(request, score):
+@app.route("/clear/<int:score>")
+async def clear_proxies(score):
     if redis_conn.clear_proxies(score):
-        return json({"Clear": "Successful"})
-    return json({"Clear": "Score should >= 0 and <= 10"})
+        return jsonify({"Clear": "Successful"})
+    return jsonify({"Clear": "Score should >= 0 and <= 10"})
